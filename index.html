@@ -60,7 +60,7 @@
         }
 
         @keyframes fadeOutSplash {
-            to { opacity: 0; visibility: hidden; }
+            to { opacity: 0; visibility: hidden; pointer-events: none; }
         }
 
         /* --- MAIN MENU SCREEN --- */
@@ -446,7 +446,7 @@
                 id: 2, 
                 name: "M1 - Kombin Tarzı", 
                 image: "kombin2.png", 
-                boxImage: "kombin2.png", 
+                boxImage: "m1.png", 
                 song: "Tanıtım Müziği", 
                 audioSrc: "tanitim.m4a", 
                 label: "m1.png",
@@ -456,7 +456,7 @@
                 id: 3, 
                 name: "M2 - Kombin Tarzı", 
                 image: "kombin3.png", 
-                boxImage: "kombin3.png", 
+                boxImage: "m2.png", 
                 song: "Someone", 
                 audioSrc: "someone.m4a", 
                 label: "m2.png",
@@ -466,7 +466,7 @@
                 id: 4, 
                 name: "M3 - Kombin Tarzı", 
                 image: "kombin4.png", 
-                boxImage: "kombin4.png", 
+                boxImage: "m3.png", 
                 song: "Dracula", 
                 audioSrc: "dracula.m4a", 
                 label: "m3.png",
@@ -476,7 +476,7 @@
                 id: 5, 
                 name: "M4 - Kombin Tarzı", 
                 image: "kombin5.png", 
-                boxImage: "kombin5.png", 
+                boxImage: "m4.png", 
                 song: "Dynimate", 
                 audioSrc: "dynimate.m4a", 
                 label: "m4.png",
@@ -486,7 +486,7 @@
                 id: 6, 
                 name: "M5 - Kombin Tarzı", 
                 image: "kombin6.png", 
-                boxImage: "kombin6.png", 
+                boxImage: "m5.png", 
                 song: "Şımarık", 
                 audioSrc: "simarik.m4a", 
                 label: "m5.png",
@@ -496,7 +496,7 @@
                 id: 7, 
                 name: "M6 - Kombin Tarzı", 
                 image: "kombin7.png", 
-                boxImage: "kombin7.png", 
+                boxImage: "m6.png", 
                 song: "Öyle Bir", 
                 audioSrc: "oylebir.m4a", 
                 label: "m6.png",
@@ -506,7 +506,7 @@
                 id: 8, 
                 name: "M7 - Kombin Tarzı", 
                 image: "kombin8.png", 
-                boxImage: "kombin8.png", 
+                boxImage: "m7.png", 
                 song: "Mevlam Kayıra", 
                 audioSrc: "mevlamkayira.m4a", 
                 label: "m7.png",
@@ -516,7 +516,7 @@
                 id: 9, 
                 name: "M8 - Kombin Tarzı", 
                 image: "kombin9.png", 
-                boxImage: "kombin9.png", 
+                boxImage: "m8.png", 
                 song: "Benim Ol", 
                 audioSrc: "benimol.m4a", 
                 label: "m8.png",
@@ -526,7 +526,7 @@
                 id: 10, 
                 name: "M9 - Kombin Tarzı", 
                 image: "kombin10.png", 
-                boxImage: "kombin10.png", 
+                boxImage: "m9.png", 
                 song: "Çakkıdı / Çak", 
                 audioSrc: "cakkri.m4a", 
                 label: "m9.png",
@@ -536,7 +536,7 @@
                 id: 11, 
                 name: "M10 - Kombin Tarzı", 
                 image: "kombin11.png", 
-                boxImage: "kombin11.png", 
+                boxImage: "m10.png", 
                 song: "Çıldırdım", 
                 audioSrc: "cildircam.m4a", 
                 label: "m10.png",
@@ -546,7 +546,7 @@
                 id: 12, 
                 name: "M11 - Kombin Tarzı", 
                 image: "kombin12.png", 
-                boxImage: "kombin12.png", 
+                boxImage: "m11.png", 
                 song: "Final Melodisi", 
                 audioSrc: "final.m4a", 
                 label: "m11.png",
@@ -584,7 +584,8 @@
         }
 
         function openHowToPlay() {
-            document.getElementById('how-to-modal').style.display = 'flex';
+            const modal = document.getElementById('how-to-modal');
+            modal.style.display = 'flex';
         }
 
         function closeHowToPlay(e) {
@@ -646,4 +647,4 @@
         }
 
         function updatePlayerStatus() {
-            const statusEl = document.getElementById('playe
+            const statusEl = document.getElementById('player
