@@ -383,17 +383,17 @@
         <h1 class="menu-title">Beton Archive</h1>
         <p class="menu-subtitle">İnteraktif Kombin & Müzik Dünyası</p>
         <div class="menu-buttons">
-            <button class="menu-btn" onclick="startGame()">Oyna</button>
-            <button class="menu-btn secondary" onclick="openHowToPlay()">Nasıl Oynanır?</button>
+            <button class="menu-btn" id="start-btn">Oyna</button>
+            <button class="menu-btn secondary" id="how-to-btn">Nasıl Oynanır?</button>
         </div>
     </div>
 
     <!-- HOW TO PLAY MODAL -->
-    <div id="how-to-modal" onclick="closeHowToPlay(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
+    <div id="how-to-modal">
+        <div class="modal-content">
             <h2>Nasıl Oynanır?</h2>
             <p>Aşağıdaki kombin kutularına tıklayarak karakterin farklı tarzlarını inceleyebilirsin. Her kombin seçildiğinde karakter özel kıyafetlerini giyecek ve o kombine özel parça arka planda çalmaya başlayacaktır!</p>
-            <button class="menu-btn" style="margin-top: 15px; width: 100%;" onclick="closeHowToPlayDirect()">Anladım</button>
+            <button class="menu-btn" id="modal-close-btn" style="margin-top: 15px; width: 100%;">Anladım</button>
         </div>
     </div>
 
@@ -418,7 +418,7 @@
 
             <div class="music-player">
                 <span id="player-status">Müzik Durumu: Çalıyor</span>
-                <button id="toggle-music-btn" onclick="toggleMusic()">Müziği Durdur</button>
+                <button id="toggle-music-btn">Müziği Durdur</button>
             </div>
 
             <div class="wardrobe-section">
@@ -558,6 +558,14 @@
         let currentSongName = "Farkımız Yok";
         const audioElement = document.getElementById('bg-audio');
 
+        // Güvenli Event Listener Tanımlamaları
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('how-to-btn').addEventListener('click', openHowToPlay);
+        document.getElementById('modal-close-btn').addEventListener('click', closeHowToPlayDirect);
+        document.getElementById('how-to-modal').addEventListener('click', closeHowToPlay);
+        document.querySelector('.modal-content').addEventListener('click', (e) => e.stopPropagation());
+        document.getElementById('toggle-music-btn').addEventListener('click', toggleMusic);
+
         function startGame() {
             const mainMenu = document.getElementById('main-menu');
             mainMenu.style.opacity = '0';
@@ -584,8 +592,7 @@
         }
 
         function openHowToPlay() {
-            const modal = document.getElementById('how-to-modal');
-            modal.style.display = 'flex';
+            document.getElementById('how-to-modal').style.display = 'flex';
         }
 
         function closeHowToPlay(e) {
@@ -603,7 +610,7 @@
             outfits.forEach((outfit, index) => {
                 const card = document.createElement('div');
                 card.className = `outfit-card ${index === 0 ? 'active' : ''}`;
-                card.onclick = () => selectOutfit(outfit, card);
+                card.addEventListener('click', () => selectOutfit(outfit, card));
 
                 card.innerHTML = `
                     <img src="${outfit.boxImage}" alt="${outfit.name}">
@@ -631,20 +638,4 @@
                 audioElement.src = outfit.audioSrc;
                 if (isPlaying) {
                     audioElement.play().catch(e => console.log("Müzik çalma hatası:", e));
-                }
-            }
-            updatePlayerStatus();
-        }
-
-        function toggleMusic() {
-            isPlaying = !isPlaying;
-            if (isPlaying) {
-                audioElement.play().catch(e => console.log("Müzik çalma hatası:", e));
-            } else {
-                audioElement.pause();
-            }
-            updatePlayerStatus();
-        }
-
-        function updatePlayerStatus() {
-            const statusEl = document.getElementById('player
+        
