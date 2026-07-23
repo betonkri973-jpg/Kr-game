@@ -1,0 +1,651 @@
+```html
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beton Archive - İnteraktif Kombin & Müzik Deneyimi</title>
+    <style>
+        :root {
+            --bg-color: #0f1016;
+            --panel-bg: rgba(25, 26, 35, 0.85);
+            --accent-color: #ffc107;
+            --text-color: #f1f1f1;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SPLASH SCREEN --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #08090d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeOutSplash 1.5s ease 2.5s forwards;
+        }
+
+        .splash-text {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeInOut 2.5s ease forwards;
+            text-align: center;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.05); }
+        }
+
+        @keyframes fadeOutSplash {
+            to { opacity: 0; visibility: hidden; }
+        }
+
+        /* --- MAIN MENU SCREEN --- */
+        #main-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(25,26,35,1) 0%, rgba(10,11,15,1) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+            gap: 25px;
+            transition: opacity 0.8s ease;
+        }
+
+        .menu-title {
+            font-size: 2.8rem;
+            letter-spacing: 4px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            margin: 0;
+            text-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+            text-align: center;
+        }
+
+        .menu-subtitle {
+            font-size: 1rem;
+            color: #aaa;
+            margin-top: -15px;
+            letter-spacing: 1px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 240px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            border: none;
+            color: #000;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+        }
+
+        .menu-btn.secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid var(--border-color);
+        }
+
+        .menu-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- HOW TO PLAY MODAL --- */
+        #how-to-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 600;
+        }
+
+        .modal-content {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal-content h2 {
+            color: var(--accent-color);
+            margin-top: 0;
+        }
+
+        .modal-content p {
+            font-size: 0.95rem;
+            color: #ddd;
+            line-height: 1.5;
+        }
+
+        /* --- GAME CONTAINER --- */
+        #game-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            box-sizing: border-box;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        header {
+            text-align: center;
+            padding: 8px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            width: 100%;
+            box-sizing: border-box;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 12px;
+        }
+
+        /* Dynamic Banner above character */
+        #dynamic-banner {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-align: center;
+            min-height: 25px;
+            text-shadow: 0 2px 10px rgba(255, 193, 7, 0.3);
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .character-viewport {
+            position: relative;
+            width: 240px;
+            height: 330px;
+            background: radial-gradient(circle, rgba(40,42,54,1) 0%, rgba(15,16,22,1) 100%);
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .character-viewport img {
+            max-height: 95%;
+            max-width: 95%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .current-style-info {
+            text-align: center;
+            background: var(--panel-bg);
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        .current-style-info h3 {
+            margin: 0 0 2px 0;
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        .current-style-info p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--accent-color);
+        }
+
+        .music-player {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            font-size: 0.75rem;
+        }
+
+        .music-player button {
+            background: var(--accent-color);
+            border: none;
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
+
+        .wardrobe-section {
+            width: 100%;
+            background: var(--panel-bg);
+            border-radius: 15px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        .wardrobe-section h2 {
+            margin: 0 0 10px 0;
+            font-size: 0.95rem;
+            text-align: center;
+            color: #ddd;
+            letter-spacing: 1px;
+        }
+
+        .outfit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+            gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .outfit-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .outfit-card img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .outfit-card span {
+            font-size: 0.65rem;
+            color: #ccc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .outfit-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .outfit-card.active {
+            border-color: var(--accent-color);
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .outfit-grid::-webkit-scrollbar {
+            width: 5px;
+        }
+        .outfit-grid::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+        }
+        .outfit-grid::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SPLASH SCREEN -->
+    <div id="splash-screen">
+        <div class="splash-text">Beton Archive Sunar</div>
+    </div>
+
+    <!-- MAIN MENU SCREEN -->
+    <div id="main-menu">
+        <h1 class="menu-title">Beton Archive</h1>
+        <p class="menu-subtitle">İnteraktif Kombin & Müzik Dünyası</p>
+        <div class="menu-buttons">
+            <button class="menu-btn" onclick="startGame()">Oyna</button>
+            <button class="menu-btn secondary" onclick="openHowToPlay()">Nasıl Oynanır?</button>
+        </div>
+    </div>
+
+    <!-- HOW TO PLAY MODAL -->
+    <div id="how-to-modal" onclick="closeHowToPlay(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2>Nasıl Oynanır?</h2>
+            <p>Aşağıdaki kombin kutularına tıklayarak karakterin farklı tarzlarını inceleyebilirsin. Her kombin seçildiğinde karakter özel kıyafetlerini giyecek ve o kombine özel parça arka planda çalmaya başlayacaktır!</p>
+            <button class="menu-btn" style="margin-top: 15px; width: 100%;" onclick="closeHowToPlayDirect()">Anladım</button>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen">
+        <header>
+            <h1>Beton Archive</h1>
+        </header>
+
+        <div class="game-container">
+            <!-- Dynamic Banner Text -->
+            <div id="dynamic-banner">hoş geldin KRI</div>
+
+            <div class="character-viewport">
+                <img id="character-img" src="karakter.png" alt="Ana Karakter">
+            </div>
+
+            <div class="current-style-info">
+                <h3 id="style-title">Varsayılan Görünüm</h3>
+                <p id="style-song">🎵 Çalan Şarkı: Farkımız Yok</p>
+            </div>
+
+            <div class="music-player">
+                <span id="player-status">Müzik Durumu: Çalıyor</span>
+                <button id="toggle-music-btn" onclick="toggleMusic()">Müziği Durdur</button>
+            </div>
+
+            <div class="wardrobe-section">
+                <h2>Kombin Kutularını Seç</h2>
+                <div class="outfit-grid" id="outfit-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bg-audio" loop></audio>
+
+    <script>
+        const outfits = [
+            { 
+                id: 1, 
+                name: "Varsayılan Karakter", 
+                image: "karakter.png", 
+                boxImage: "karakter.png", 
+                song: "Farkımız Yok", 
+                audioSrc: "farkimizyok.m4a", 
+                label: "Varsayılan",
+                bannerText: "hoş geldin KRI"
+            },
+            { 
+                id: 2, 
+                name: "M1 - Kombin Tarzı", 
+                image: "kombin2.png", 
+                boxImage: "kombin2.png", 
+                song: "Tanıtım Müziği", 
+                audioSrc: "tanitim.m4a", 
+                label: "M1",
+                bannerText: ""
+            },
+            { 
+                id: 3, 
+                name: "M2 - Kombin Tarzı", 
+                image: "kombin3.png", 
+                boxImage: "kombin3.png", 
+                song: "Someone", 
+                audioSrc: "someone.m4a", 
+                label: "m2",
+                bannerText: ""
+            },
+            { 
+                id: 4, 
+                name: "M3 - Kombin Tarzı", 
+                image: "kombin4.png", 
+                boxImage: "kombin4.png", 
+                song: "Dracula", 
+                audioSrc: "dracula.m4a", 
+                label: "m3",
+                bannerText: ""
+            },
+            { 
+                id: 5, 
+                name: "M4 - Kombin Tarzı", 
+                image: "kombin5.png", 
+                boxImage: "kombin5.png", 
+                song: "Dynimate", 
+                audioSrc: "dynimate.m4a", 
+                label: "m4",
+                bannerText: ""
+            },
+            { 
+                id: 6, 
+                name: "M5 - Kombin Tarzı", 
+                image: "kombin6.png", 
+                boxImage: "kombin6.png", 
+                song: "Şımarık", 
+                audioSrc: "simarik.m4a", 
+                label: "m5",
+                bannerText: ""
+            },
+            { 
+                id: 7, 
+                name: "M6 - Kombin Tarzı", 
+                image: "kombin7.png", 
+                boxImage: "kombin7.png", 
+                song: "Öyle Bir", 
+                audioSrc: "oylebir.m4a", 
+                label: "m6",
+                bannerText: ""
+            },
+            { 
+                id: 8, 
+                name: "M7 - Kombin Tarzı", 
+                image: "kombin8.png", 
+                boxImage: "kombin8.png", 
+                song: "Mevlam Kayıra", 
+                audioSrc: "mevlamkayira.m4a", 
+                label: "m7",
+                bannerText: "Saldım Kayıra Mevlam Kayıra - Betonkrı"
+            },
+            { 
+                id: 9, 
+                name: "M8 - Kombin Tarzı", 
+                image: "kombin9.png", 
+                boxImage: "kombin9.png", 
+                song: "Benim Ol", 
+                audioSrc: "benimol.m4a", 
+                label: "m8",
+                bannerText: ""
+            },
+            { 
+                id: 10, 
+                name: "M9 - Kombin Tarzı", 
+                image: "kombin10.png", 
+                boxImage: "kombin10.png", 
+                song: "Çakkıdı / Çak", 
+                audioSrc: "cakkri.m4a", 
+                label: "m9",
+                bannerText: "yuh"
+            },
+            { 
+                id: 11, 
+                name: "M10 - Kombin Tarzı", 
+                image: "kombin11.png", 
+                boxImage: "kombin11.png", 
+                song: "Çıldırdım", 
+                audioSrc: "cildircam.m4a", 
+                label: "m10",
+                bannerText: "ÇILLDIRCAAM"
+            },
+            { 
+                id: 12, 
+                name: "M11 - Kombin Tarzı", 
+                image: "kombin12.png", 
+                boxImage: "kombin12.png", 
+                song: "Final Melodisi", 
+                audioSrc: "final.m4a", 
+                label: "m11",
+                bannerText: "🤏🏻"
+            }
+        ];
+
+        let isPlaying = false;
+        let currentSongName = "Farkımız Yok";
+        const audioElement = document.getElementById('bg-audio');
+
+        function startGame() {
+            const mainMenu = document.getElementById('main-menu');
+            mainMenu.style.opacity = '0';
+            setTimeout(() => {
+                mainMenu.style.display = 'none';
+                const gameScreen = document.getElementById('game-screen');
+                gameScreen.style.display = 'flex';
+                setTimeout(() => {
+                    gameScreen.style.opacity = '1';
+                }, 50);
+                
+                audioElement.src = "farkimizyok.m4a";
+                audioElement.play().then(() => {
+                    isPlaying = true;
+                    updatePlayerStatus();
+                }).catch(e => {
+                    console.log("Ses oynatma engellendi:", e);
+                    isPlaying = false;
+                    updatePlayerStatus();
+                });
+
+                initWardrobe();
+            }, 800);
+        }
+
+        function openHowToPlay() {
+            document.getElementById('how-to-modal').style.display = 'flex';
+        }
+
+        function closeHowToPlay(e) {
+            document.getElementById('how-to-modal').style.display = 'none';
+        }
+
+        function closeHowToPlayDirect() {
+            document.getElementById('how-to-modal').style.display = 'none';
+        }
+
+        function initWardrobe() {
+            const grid = document.getElementById('outfit-grid');
+            grid.innerHTML = '';
+
+            outfits.forEach((outfit, index) => {
+                const card = document.createElement('div');
+                card.className = `outfit-card ${index === 0 ? 'active' : ''}`;
+                card.onclick = () => selectOutfit(outfit, card);
+
+                card.innerHTML = `
+                    <img src="${outfit.boxImage}" alt="${outfit.name}">
+                    <span>${outfit.label}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function selectOutfit(outfit, element) {
+            document.querySelectorAll('.outfit-card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+
+            const charImg = document.getElementById('character-img');
+            charImg.src = outfit.image;
+
+            // Update banner text
+            const banner = document.getElementById('dynamic-banner');
+            banner.innerText = outfit.bannerText || "";
+
+            document.getElementById('style-title').innerText = outfit.name;
+            document.getElementById('style-song').innerText = `🎵 Çalan Şarkı: ${outfit.song}`;
+            currentSongName = outfit.song;
+
+            if (outfit.audioSrc) {
+                audioElement.src = outfit.audioSrc;
+                if (isPlaying) {
+                    audioElement.play().catch(e => console.log("Müzik çalma hatası:", e));
+                }
+            }
+            updatePlayerStatus();
+        }
+
+        function toggleMusic() {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                audioElement.play().catch(e => console.log("Müzik çalma hatası:", e));
+            } else {
+                audioElement.pause();
+            }
+            updatePlayerStatus();
+        }
+
+        function updatePlayerStatus() {
+            const statusEl = document.getElementById('player-st
